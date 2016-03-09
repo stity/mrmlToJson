@@ -33,18 +33,7 @@ var vtkFilesDirectory = config.vtkFilesDirectory;
 var jsonResultFileName = config.jsonResultFileName;
 
 //------------------------------------------------- DEFINING HEADER -------------------------------------------------//
-var header = {
-    "@type": "header",
-    "species": "human",
-    "organ": "knee",
-    "name" : "SPL Knee Atlas",
-    "license" : "?",
-    "citation" : "?",
-    "version" : "1",
-    "contact" : "",
-    "comment" : "",
-    "coordinate_system" : "self defined"
-};
+var header = config.header;
 JSONResult.push(header);
 
 
