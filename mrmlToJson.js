@@ -87,8 +87,8 @@ function buildHierarchy () {
                     members : extractedHierarchy.Hierarchies['__default__'][label].children //store the reference of the hierarchy node to retrieve uuid once every group is created
                 };
                 if (extractedHierarchy.Hierarchies['__default__']['__root__'].children.indexOf(label) > -1) {
-                    //group is at the root so we create a root annotation to be able to easily built the tree later
-                    group.root = true;
+                    //group is at the root so we add it to the list of root groups in the header
+                    header.roots.push(group['@id']);
                 }
                 extractedHierarchy.nodes[label].uuid = group['@id'];
                 JSONResult.push(group);

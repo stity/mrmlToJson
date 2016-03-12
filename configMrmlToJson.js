@@ -14,6 +14,7 @@ module.exports = {
         "version" : "1",
         "contact" : "",
         "comment" : "",
-        "coordinate_system" : "self defined"
+        "coordinate_system" : "self defined",
+        "roots" : []
     }
 }
