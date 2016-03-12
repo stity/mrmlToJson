@@ -15,6 +15,7 @@ module.exports = {
         "contact" : "",
         "comment" : "",
         "coordinate_system" : "self defined",
-        "roots" : []
+        "roots" : [],
+        "backgroundImages" : ""
     }
 }
