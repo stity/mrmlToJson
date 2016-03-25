@@ -9,21 +9,13 @@ var successLog = chalk.green;
 var warningLog = chalk.yellow;
 
 //global vars
-var nrrdConversion,
-    nrrdParser,
-    vtkConversion,
-    vtkFiles,
-    vtkAtlasTSV,
-    colorCheck,
-    extractedHierarchy,
+var extractedHierarchy,
     buildHierarchy,
     writeJSONFile,
-    hncma = {},
-    skin = {},
-    hncmaAtlasTSV,
-    hncmaColorTable,
     JSONResult = [],
-    initialDate = Date.now();
+    initialDate = Date.now(),
+    defaultLabelMap = null,
+    labelMapExceptions = [];
 
 //parameters
 var config = require('../configMrmlToJson.js');
@@ -65,17 +57,77 @@ function getUidFromStructureName (name) {
                 }
                 else {
                     extractedHierarchy = JSON.parse(data);
+                    addNRRDFiles();
                     buildHierarchy();
                 }
-            })
+            });
         }
     );
-})()
+})();
+
+function addNRRDFiles () {
+    var backgroundImagesNames = config.backgroundImages,
+        labelMapNames = config.labelMapFiles,
+        name,
+        object,
+        i,
+        backgroundIds = [];
+
+    function getNRRDDatasource (source) {
+        return { "@id" : uuid.v4(), "@type" : "datasource", "mimeType": "application/x-nrrd", "source" : source};
+    }
+
+    if (Array.isArray(backgroundImagesNames)) {
+        for (i = 0; i < backgroundImagesNames.length; i++) {
+            name = backgroundImagesNames[i];
+            object = getNRRDDatasource(name);
+            backgroundIds.push(object["@id"]);
+            JSONResult.push(object);
+        }
+        header.backgroundImages = backgroundIds;
+    }
+    else {
+        object = getNRRDDatasource(backgroundImagesNames);
+        header.backgroundImages = object["@id"];
+        JSONResult.push(object);
+    }
+
+    if (Array.isArray(labelMapNames)) {
+        for (i = 0; i < labelMapNames.length; i++) {
+            name = labelMapNames[i].name;
+            object = getNRRDDatasource(name);
+            if (Array.isArray(labelMapNames[i].includes)) {
+                for (var j = 0; j < labelMapNames[i].includes; j++) {
+                    labelMapExceptions[labelMapNames[i].includes[j]] = object;
+                }
+            }
+            else if (labelMapNames[i].includes === '*' && !defaultLabelMap) {
+                defaultLabelMap = object;
+            }
+            JSONResult.push(object);
+
+        }
+    }
+    else {
+        //only one label map
+        object = getNRRDDatasource(labelMapNames);
+        defaultLabelMap = object;
+        JSONResult.push(object);
+    }
+}
+
+function getLabelFromModelName (modelName) {
+
+    var reg = /Model_(\d+)/;
+    var result = modelName.match(reg);
+    return result && Number(result[1]);
+
+}
 
 function buildHierarchy () {
     if (extractedHierarchy) {
         for (var label in extractedHierarchy.nodes) {
-            if (label in extractedHierarchy.Hierarchies['__default__']) {
+            if (label in extractedHierarchy.Hierarchies.__default__) {
                 //then its a group
 
                 var group = {
@@ -84,9 +136,9 @@ function buildHierarchy () {
                     "annotation" : {
                         name : extractedHierarchy.nodes[label].name
                     },
-                    members : extractedHierarchy.Hierarchies['__default__'][label].children //store the reference of the hierarchy node to retrieve uuid once every group is created
+                    members : extractedHierarchy.Hierarchies.__default__[label].children //store the reference of the hierarchy node to retrieve uuid once every group is created
                 };
-                if (extractedHierarchy.Hierarchies['__default__']['__root__'].children.indexOf(label) > -1) {
+                if (extractedHierarchy.Hierarchies.__default__.__root__.children.indexOf(label) > -1) {
                     //group is at the root so we add it to the list of root groups in the header
                     header.roots.push(group['@id']);
                 }
@@ -103,32 +155,45 @@ function buildHierarchy () {
                     "source": vtkFilesDirectory+extractedHierarchy.nodes[label].modelFile
                 };
 
+                var dataKey = getLabelFromModelName(extractedHierarchy.nodes[label].modelFile);
+                var labelMapDatasource = labelMapExceptions[dataKey] || defaultLabelMap;
+                var labelMapSelector = {
+                    "@type" : ["selector", "labelMapSelector"],
+                    dataKey : dataKey,
+                    dataSource : labelMapDatasource['@id'],
+                    authoritative : true
+                };
+
                 var structure = {
                     "@id" : uuid.v4(),
                     "@type" : "structure",
                     "annotation" : {
                         name : extractedHierarchy.nodes[label].name
                     },
-                    "sourceSelector" : {
+                    "sourceSelector" : [{
+                        "@type" : ["selector", "geometrySelector"],
                         dataSource : dataSource['@id']
-                    },
+                    }, labelMapSelector],
                     "renderOptions" : {
                         color : extractedHierarchy.nodes[label].color
                     }
                 };
-                
+
+
+
                 extractedHierarchy.nodes[label].uuid = structure['@id'];
-                
+
                 JSONResult.push(dataSource);
                 JSONResult.push(structure);
-                
+
             }
         }
         //at this point, every object is created, we just need to retrieve uuid of the members of the groups
+        var _getNodeUuid = memberLabel => extractedHierarchy.nodes[memberLabel].uuid;
         for (var i = 0; i<JSONResult.length; i++) {
             var item = JSONResult[i];
             if (item['@type']==='group') {
-                item.members = item.members.map(memberLabel => extractedHierarchy.nodes[memberLabel].uuid);
+                item.members = item.members.map(_getNodeUuid);
             }
         }
         buildHierarchy.done = true;

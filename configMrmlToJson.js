@@ -15,7 +15,12 @@ module.exports = {
         "contact" : "",
         "comment" : "",
         "coordinate_system" : "self defined",
-        "roots" : [],
-        "backgroundImages" : ""
-    }
-}
+        "roots" : []
+    },
+    labelMapFiles : [{ // can be a list of objects or just a name (if there is only one labelmap)
+        name : "",
+        includes : [] // a list of label exception [1,23,854, ...] or just "*" which mean that this the default file to look in which means that there can only be only one file with "*" as includes value
+    }],
+    "backgroundImages" : "" //can be a name or a list of names
+
+};
