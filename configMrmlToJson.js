@@ -4,6 +4,7 @@ module.exports = {
     colorTableFileLocation : "",
     vtkFilesDirectory : "",
     jsonResultFileName : "atlasStructure.json",
+    filesDisplayName : {},
     header : {
         "@type": "header",
         "species": "human",

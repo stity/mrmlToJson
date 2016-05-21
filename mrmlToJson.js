@@ -74,7 +74,11 @@ function addNRRDFiles () {
         backgroundIds = [];
 
     function getNRRDDatasource (source) {
-        return { "@id" : uuid.v4(), "@type" : "datasource", "mimeType": "application/x-nrrd", "source" : source};
+        var val = { "@id" : uuid.v4(), "@type" : "datasource", "mimeType": "application/x-nrrd", "source" : source};
+        if (config.filesDisplayName && config.filesDisplayName[source]) {
+            val.displayName = config.filesDisplayName[source];
+        }
+        return val;
     }
 
     if (Array.isArray(backgroundImagesNames)) {
