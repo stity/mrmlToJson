@@ -75,7 +75,7 @@ function addNRRDFiles () {
         backgroundIds = [];
 
     function getNRRDDatasource (source) {
-        var val = { "@id" : uuid.v4(), "@type" : "Datasource", "mimeType": "application/x-nrrd", "source" : source};
+        var val = { "@id" : uuid.v4(), "@type" : "DataSource", "mimeType": "application/x-nrrd", "source" : source};
         if (config.filesDisplayName && config.filesDisplayName[source]) {
             val.displayName = config.filesDisplayName[source];
         }
@@ -155,7 +155,7 @@ function buildHierarchy () {
 
                 var dataSource = {
                     "@id" : uuid.v4(),
-                    "@type" : "Datasource",
+                    "@type" : "DataSource",
                     "mimeType": "application/octet-stream",
                     "source": vtkFilesDirectory+extractedHierarchy.nodes[label].modelFile
                 };
