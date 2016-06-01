@@ -26,6 +26,7 @@ var jsonResultFileName = config.jsonResultFileName;
 
 //------------------------------------------------- DEFINING HEADER -------------------------------------------------//
 var header = config.header;
+header['@id'] = uuid.v4();
 JSONResult.push(header);
 
 
@@ -33,7 +34,7 @@ JSONResult.push(header);
 //--------------------------------------- BUILD HIERARCHY FROM THE MRML FILE ----------------------------------------//
 
 function getUidFromStructureName (name) {
-    var matchingStructures = JSONResult.filter(item => item['@type']==="structure" && item.annotation.name===name);
+    var matchingStructures = JSONResult.filter(item => item['@type']==="Structure" && item.annotation.name===name);
     if (matchingStructures.length > 1) {
         //keep only structures with no data key ie vtk file
         matchingStructures = matchingStructures.filter(item => item.sourceSelector && item.sourceSelector.dataKey===undefined);
@@ -74,7 +75,7 @@ function addNRRDFiles () {
         backgroundIds = [];
 
     function getNRRDDatasource (source) {
-        var val = { "@id" : uuid.v4(), "@type" : "datasource", "mimeType": "application/x-nrrd", "source" : source};
+        var val = { "@id" : uuid.v4(), "@type" : "Datasource", "mimeType": "application/x-nrrd", "source" : source};
         if (config.filesDisplayName && config.filesDisplayName[source]) {
             val.displayName = config.filesDisplayName[source];
         }
@@ -88,11 +89,11 @@ function addNRRDFiles () {
             backgroundIds.push(object["@id"]);
             JSONResult.push(object);
         }
-        header.backgroundImages = backgroundIds;
+        header.backgroundImage = backgroundIds;
     }
     else {
         object = getNRRDDatasource(backgroundImagesNames);
-        header.backgroundImages = object["@id"];
+        header.backgroundImage = object["@id"];
         JSONResult.push(object);
     }
 
@@ -136,15 +137,15 @@ function buildHierarchy () {
 
                 var group = {
                     "@id" : uuid.v4(),
-                    "@type" : "group",
+                    "@type" : "Group",
                     "annotation" : {
                         name : extractedHierarchy.nodes[label].name
                     },
-                    members : extractedHierarchy.Hierarchies.__default__[label].children //store the reference of the hierarchy node to retrieve uuid once every group is created
+                    member : extractedHierarchy.Hierarchies.__default__[label].children //store the reference of the hierarchy node to retrieve uuid once every group is created
                 };
                 if (extractedHierarchy.Hierarchies.__default__.__root__.children.indexOf(label) > -1) {
                     //group is at the root so we add it to the list of root groups in the header
-                    header.roots.push(group['@id']);
+                    header.root.push(group['@id']);
                 }
                 extractedHierarchy.nodes[label].uuid = group['@id'];
                 JSONResult.push(group);
@@ -154,7 +155,7 @@ function buildHierarchy () {
 
                 var dataSource = {
                     "@id" : uuid.v4(),
-                    "@type" : "datasource",
+                    "@type" : "Datasource",
                     "mimeType": "application/octet-stream",
                     "source": vtkFilesDirectory+extractedHierarchy.nodes[label].modelFile
                 };
@@ -162,7 +163,7 @@ function buildHierarchy () {
                 var dataKey = getLabelFromModelName(extractedHierarchy.nodes[label].modelFile);
                 var labelMapDatasource = labelMapExceptions[dataKey] || defaultLabelMap;
                 var labelMapSelector = {
-                    "@type" : ["selector", "labelMapSelector"],
+                    "@type" : ["Selector", "LabelMapSelector"],
                     dataKey : dataKey,
                     dataSource : labelMapDatasource['@id'],
                     authoritative : true
@@ -170,7 +171,7 @@ function buildHierarchy () {
 
                 var structure = {
                     "@id" : uuid.v4(),
-                    "@type" : "structure",
+                    "@type" : "Structure",
                     "annotation" : {
                         name : extractedHierarchy.nodes[label].name
                     },
@@ -196,8 +197,8 @@ function buildHierarchy () {
         var _getNodeUuid = memberLabel => extractedHierarchy.nodes[memberLabel].uuid;
         for (var i = 0; i<JSONResult.length; i++) {
             var item = JSONResult[i];
-            if (item['@type']==='group') {
-                item.members = item.members.map(_getNodeUuid);
+            if (item['@type']==='Group') {
+                item.member = item.member.map(_getNodeUuid);
             }
         }
         buildHierarchy.done = true;

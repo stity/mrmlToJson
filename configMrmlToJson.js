@@ -6,7 +6,7 @@ module.exports = {
     jsonResultFileName : "atlasStructure.json",
     filesDisplayName : {},
     header : {
-        "@type": "header",
+        "@type": "Header",
         "species": "human",
         "organ": "",
         "name" : "",
@@ -15,8 +15,8 @@ module.exports = {
         "version" : "1",
         "contact" : "",
         "comment" : "",
-        "coordinate_system" : "self defined",
-        "roots" : []
+        "coordinateSystem" : "self defined",
+        "root" : []
     },
     labelMapFiles : [{ // can be a list of objects or just a name (if there is only one labelmap)
         name : "",
