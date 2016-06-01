@@ -179,7 +179,7 @@ function buildHierarchy () {
                         "@type" : ["selector", "geometrySelector"],
                         dataSource : dataSource['@id']
                     }, labelMapSelector],
-                    "renderOptions" : {
+                    "renderOption" : {
                         color : extractedHierarchy.nodes[label].color
                     }
                 };
