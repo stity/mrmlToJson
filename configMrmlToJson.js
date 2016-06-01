@@ -4,6 +4,7 @@ module.exports = {
     colorTableFileLocation : "",
     vtkFilesDirectory : "",
     jsonResultFileName : "atlasStructure.json",
+    jsonLDResultFileName : "atlasStructureLD.json",
     filesDisplayName : {},
     header : {
         "@type": "Header",
@@ -22,6 +23,30 @@ module.exports = {
         name : "",
         includes : [] // a list of label exception [1,23,854, ...] or just "*" which mean that this the default file to look in which means that there can only be only one file with "*" as includes value
     }],
-    "backgroundImages" : "" //can be a name or a list of names
+    "backgroundImages" : "", //can be a name or a list of names
+    "@context" : { // for JSON LD compatibility, specify places where aplication expect a reference
+        "@vocab": "http://www.openanatomy.org/schema/v1/#",
+        "backgroundImage": {
+            "@type": "@id"
+        },
+        "root": {
+            "@type": "@id"
+        },
+        "member": {
+            "@type": "@id"
+        },
+        "dataSource": {
+            "@type": "@id"
+        },
+        "sourceSelector": {
+            "@type": "@id"
+        },
+        "annotation": {
+            "@type": "@id"
+        },
+        "renderOption": {
+            "@type": "@id"
+        }
+    }
 
 };

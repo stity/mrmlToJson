@@ -218,6 +218,20 @@ function writeJSONFile () {
 
             console.log(successLog("The JSON file was saved!"));
             console.log('done in '+(Date.now()-initialDate)+'ms');
-        }); 
+        });
+
+        var JSONLD = {
+            "@context" : config['@context'],
+            "@graph" : JSONResult
+        };
+
+        fs.writeFile(config.jsonLDResultFileName, JSON.stringify(JSONLD, null, 4), function(err) {
+            if(err) {
+                return console.log(errorLog('Error while writing atlas structure LD : '), err);
+            }
+
+            console.log(successLog("The JSON LD file was saved!"));
+            console.log('done in '+(Date.now()-initialDate)+'ms');
+        });
     }
 }
