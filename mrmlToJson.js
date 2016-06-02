@@ -176,7 +176,7 @@ function buildHierarchy () {
                         name : extractedHierarchy.nodes[label].name
                     },
                     "sourceSelector" : [{
-                        "@type" : ["selector", "geometrySelector"],
+                        "@type" : ["Selector", "GeometrySelector"],
                         dataSource : dataSource['@id']
                     }, labelMapSelector],
                     "renderOption" : {
