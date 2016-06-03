@@ -223,7 +223,7 @@ function generateHashVersion () {
             else if (Array.isArray(obj[key])) {
                 for (var i = 0; i < obj[key].length; i++) {
                     if (typeof obj[key][i] === 'string' && uuids[obj[key][i]]) {
-                        obj[key][i] = hashify(uuids[obj[key]], true);
+                        obj[key][i] = hashify(uuids[obj[key][i]], true);
                     }
                     else if (typeof obj[key][i] === 'object') {
                         obj[key][i] = hashify(obj[key][i], false);
