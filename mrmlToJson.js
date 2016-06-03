@@ -244,17 +244,7 @@ function generateHashVersion () {
         return obj;
     }
 
-    if (Array.isArray(JSONHash[0].root)) {
-        for (i = 0; i < JSONHash[0].root.length; i++) {
-            JSONHash[0].root[i] = hashify(uuids[JSONHash[i].root[i]], true);
-        }
-    }
-    else if (typeof JSONHash[0].root === 'string') {
-        JSONHash[0].root = hashify(uuids[JSONHash[0].root], true);
-    }
-    delete JSONHash[0]['@id'];
-    var hash = getHash(JSONHash[0]);
-    JSONHash[0]['@id'] = hash;
+    JSONHash[0]['@id'] = hashify(JSONHash[0], true);
 
     return JSONHash;
 
