@@ -1,18 +1,21 @@
 {
-  "name": "mrmlToJson",
-  "version": "1.0.0",
-  "description": "Convert MRML Slicer scene to a JSON description",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/stity/mrmlToJson"
-  },
-  "author": "Valentin Demeusy",
-  "bugs": {
-    "url": "https://github.com/stity/mrmlToJson/issues"
-  },
-  "devDependencies": {},
-  "dependencies": {
-      "uuid" : ">=2.0.1",
-      "chalk" : ">=1.1.1"
-  }
+    "name": "mrmlToJson",
+    "version": "1.0.0",
+    "description": "Convert MRML Slicer scene to a JSON description",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/stity/mrmlToJson"
+    },
+    "author": "Valentin Demeusy",
+    "bugs": {
+        "url": "https://github.com/stity/mrmlToJson/issues"
+    },
+    "license" : "MIT",
+    "devDependencies": {},
+    "dependencies": {
+        "canonical-json": "0.0.4",
+        "chalk": ">=1.1.1",
+        "sha-1": "^0.1.1",
+        "uuid": ">=2.0.1"
+    }
 }

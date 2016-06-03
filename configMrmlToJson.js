@@ -5,6 +5,7 @@ module.exports = {
     vtkFilesDirectory : "",
     jsonResultFileName : "atlasStructure.json",
     jsonLDResultFileName : "atlasStructureLD.json",
+    jsonHashResultFileName : "atlasStructureLD.json",
     filesDisplayName : {},
     header : {
         "@type": "Header",

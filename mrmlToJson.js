@@ -2,6 +2,13 @@
 var fs = require('fs');
 var uuid = require ('uuid');
 var chalk = require('chalk');
+var sha = require('sha-1');
+var canonicalJSON = require('canonical-json');
+
+//define hash function
+function getHash (obj) {
+    return sha(canonicalJSON(obj));
+}
 
 //defining chalk style
 var errorLog = chalk.red.bold;
@@ -33,20 +40,6 @@ JSONResult.push(header);
 
 //--------------------------------------- BUILD HIERARCHY FROM THE MRML FILE ----------------------------------------//
 
-function getUidFromStructureName (name) {
-    var matchingStructures = JSONResult.filter(item => item['@type']==="Structure" && item.annotation.name===name);
-    if (matchingStructures.length > 1) {
-        //keep only structures with no data key ie vtk file
-        matchingStructures = matchingStructures.filter(item => item.sourceSelector && item.sourceSelector.dataKey===undefined);
-        if (matchingStructures.length > 1) {
-            throw 'Several sturctures matching the same name : '+name;
-        }
-    }
-    if (matchingStructures.length === 0) {
-        throw 'No structure matches the given name : '+name;
-    }
-    return matchingStructures[0]['@id'];
-}
 
 (function launchPythonScript() {
     require('child_process').exec(
@@ -206,7 +199,67 @@ function buildHierarchy () {
     }
 }
 
+//---------------------------------------------- GENERATE HASH VERSION ----------------------------------------------//
 
+function generateHashVersion () {
+    var JSONHash = JSON.parse(JSON.stringify(JSONResult));
+    var uuids = {};
+    var hashed = {};
+    var i;
+
+    for (i = 0; i < JSONHash.length; i++) {
+        uuids[JSONHash[i]['@id']] = JSONHash[i];
+    }
+
+
+    function hashify (obj, returnString) {
+        if (hashed[obj['@id']]) {
+            return obj['@id'];
+        }
+        for (var key in obj) {
+            if (typeof obj[key] === 'string' && uuids[obj[key]]) {
+                obj[key] = hashify(uuids[obj[key]], true);
+            }
+            else if (Array.isArray(obj[key])) {
+                for (var i = 0; i < obj[key].length; i++) {
+                    if (typeof obj[key][i] === 'string' && uuids[obj[key][i]]) {
+                        obj[key][i] = hashify(uuids[obj[key]], true);
+                    }
+                    else if (typeof obj[key][i] === 'object') {
+                        obj[key][i] = hashify(obj[key][i], false);
+                    }
+                }
+            }
+            else if (typeof obj[key] === 'object') {
+                obj[key] = hashify(obj[key], false);
+            }
+        }
+        if (returnString) {
+            delete obj["@id"];
+            var hash = getHash(obj);
+            obj["@id"] = hash;
+            hashed[hash] = true;
+            return hash;
+        }
+        return obj;
+    }
+
+    if (Array.isArray(JSONHash[0].root)) {
+        for (i = 0; i < JSONHash[0].root.length; i++) {
+            JSONHash[0].root[i] = hashify(uuids[JSONHash[i].root[i]], true);
+        }
+    }
+    else if (typeof JSONHash[0].root === 'string') {
+        JSONHash[0].root = hashify(uuids[JSONHash[0].root], true);
+    }
+    delete JSONHash[0]['@id'];
+    var hash = getHash(JSONHash[0]);
+    JSONHash[0]['@id'] = hash;
+
+    return JSONHash;
+
+
+}
 
 //------------------------------------------------ WRITING JSON FILE ------------------------------------------------//
 function writeJSONFile () {
@@ -231,6 +284,15 @@ function writeJSONFile () {
             }
 
             console.log(successLog("The JSON LD file was saved!"));
+            console.log('done in '+(Date.now()-initialDate)+'ms');
+        });
+
+        fs.writeFile(config.jsonHashResultFileName, JSON.stringify(generateHashVersion(), null, 4), function(err) {
+            if(err) {
+                return console.log(errorLog('Error while writing atlas structure hash version : '), err);
+            }
+
+            console.log(successLog("The JSON hash file was saved!"));
             console.log('done in '+(Date.now()-initialDate)+'ms');
         });
     }
