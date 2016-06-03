@@ -217,7 +217,7 @@ function generateHashVersion () {
             return obj['@id'];
         }
         for (var key in obj) {
-            if (typeof obj[key] === 'string' && uuids[obj[key]]) {
+            if (typeof obj[key] === 'string' && uuids[obj[key]] && key !== '@id') {
                 obj[key] = hashify(uuids[obj[key]], true);
             }
             else if (Array.isArray(obj[key])) {
