@@ -12,7 +12,7 @@ var canonicalJSON = require('canonical-json');
 function getHash (obj) {
     var hexValue = sha256.update(canonicalJSON(obj), 'utf8').digest('hex');
     var buf = new Buffer(hexValue, 'hex');
-    var encoded = multihash.encode(buf, 'sha-256');
+    var encoded = multihash.encode(buf, 'sha2-256');
     return multihash.toB58String(encoded);
 }
 
