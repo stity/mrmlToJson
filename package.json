@@ -10,12 +10,13 @@
     "bugs": {
         "url": "https://github.com/stity/mrmlToJson/issues"
     },
-    "license" : "MIT",
+    "license": "MIT",
     "devDependencies": {},
     "dependencies": {
         "canonical-json": "0.0.4",
         "chalk": ">=1.1.1",
-        "sha-1": "^0.1.1",
+        "multihashes": "^0.2.2",
+        "sha.js": "^2.4.5",
         "uuid": ">=2.0.1"
     }
 }

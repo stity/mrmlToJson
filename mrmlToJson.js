@@ -2,12 +2,18 @@
 var fs = require('fs');
 var uuid = require ('uuid');
 var chalk = require('chalk');
-var sha = require('sha-1');
+var hashGenerator = require('sha.js');
+var sha256 = hashGenerator('sha256');
+var sha512 = hashGenerator('sha512');
+var multihash = require('multihashes');
 var canonicalJSON = require('canonical-json');
 
 //define hash function
 function getHash (obj) {
-    return sha(canonicalJSON(obj));
+    var hexValue = sha256.update(canonicalJSON(obj), 'utf8').digest('hex');
+    var buf = new Buffer(hexValue, 'hex');
+    var encoded = multihash.encode(buf, 'sha-256');
+    return multihash.toB58String(encoded);
 }
 
 //defining chalk style
