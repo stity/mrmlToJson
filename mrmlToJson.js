@@ -42,6 +42,16 @@ var header = config.header;
 header['@id'] = uuid.v4();
 JSONResult.push(header);
 
+//------------------------------------------------ DEFINING BASE URL ------------------------------------------------//
+if (config.baseURL) {
+    var baseURL = {
+        '@id' : uuid.v4(),
+        '@type' : "BaseURL",
+        url : config.baseURL
+    };
+    JSONResult.push(baseURL);
+}
+
 
 
 //--------------------------------------- BUILD HIERARCHY FROM THE MRML FILE ----------------------------------------//
@@ -77,6 +87,9 @@ function addNRRDFiles () {
         var val = { "@id" : uuid.v4(), "@type" : "DataSource", "mimeType": "application/x-nrrd", "source" : source};
         if (config.filesDisplayName && config.filesDisplayName[source]) {
             val.displayName = config.filesDisplayName[source];
+        }
+        if (baseURL) {
+            val.baseURL = baseURL['@id'];
         }
         return val;
     }
@@ -158,6 +171,10 @@ function buildHierarchy () {
                     "mimeType": "application/octet-stream",
                     "source": vtkFilesDirectory+extractedHierarchy.nodes[label].modelFile
                 };
+
+                if (baseURL) {
+                    dataSource.baseURL = baseURL['@id'];
+                }
 
                 var dataKey = getLabelFromModelName(extractedHierarchy.nodes[label].modelFile);
                 var labelMapDatasource = labelMapExceptions[dataKey] || defaultLabelMap;
