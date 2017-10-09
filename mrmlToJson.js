@@ -27,7 +27,7 @@ var extractedHierarchy,
     writeJSONFile,
     JSONResult = [],
     initialDate = Date.now(),
-    defaultLabelMap = null,
+    defaultLabelMap = "",
     labelMapExceptions = [];
 
 //parameters
